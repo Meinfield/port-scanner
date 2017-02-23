@@ -85,18 +85,18 @@ def initiatePortScan(ip):
 	try:
 		portrange = args.port
 		portlist = portrange.split("-") #split the string into two numbers
-		if len(portlist) > 2:
+		if len(portlist) > 2: #if there are a bunch of ranges
 			print("[!] Please correctly specify a range of ports!")
 			print("[!] Exiting program...")
 			sys.exit(1)
 		elif len(portlist) > 1:
-			if portlist[0] > portlist[1]: #make sure the number are all good
+			if portlist[0] > portlist[1]: #make sure the numbers are all good
 				print("[!] First port number must be smaller than the second value!")
 				print("[!] Exiting program...")
 				sys.exit(1)
 			portrange = range(int(portlist[0]), int(portlist[1])+1) #create a range of numbers to go through
 			try:
-				checkHostLive(ip)
+				checkHostLive(ip) #make sure host exists
 				print("[*] Initiated scanning at " + strftime("%H:%M:%S") + "\n")
 				for port in portrange:
 					if str(args.protocol) == "UDP":
@@ -104,13 +104,13 @@ def initiatePortScan(ip):
 					else:
 						status = TCPscanThePort(ip, int(port))
 					if status == 1:
-						resultslist.append("Port " + str(port) + ": Open")
+						resultslist.append("Port " + str(port) + ": Open")#for writing to a file
 						print("Port " + str(port) + ": Open")
 					elif status == 2:
-						resultslist.append("Port " + str(port) + ": Filtered")
+						resultslist.append("Port " + str(port) + ": Filtered")#for writing to a file
 						print("Port " + str(port) + ": Filtered")
 					else:
-						resultslist.append("Port " + str(port) + ": Closed")
+						resultslist.append("Port " + str(port) + ": Closed")#for writing to a file
 						print("Port " + str(port) + ": Closed")
 				return resultslist
 			except:
@@ -128,13 +128,13 @@ def initiatePortScan(ip):
 				status = TCPscanThePort(ip, int(args.port))
 			
 			if status == 1:
-				resultslist.append("Port " + str(args.port) + ": Open")
+				resultslist.append("Port " + str(args.port) + ": Open")#for writing to a file
 				print("Port " + str(args.port) + ": Open")
 			elif status == 2:
-				resultslist.append("Port " + str(args.port) + ": Filtered")
+				resultslist.append("Port " + str(args.port) + ": Filtered")#for writing to a file
 				print("Port " + str(args.port) + ": Filtered")
 			else:
-				resultslist.append("Port " + str(args.port) + ": Closed")
+				resultslist.append("Port " + str(args.port) + ": Closed")#for writing to a file
 				print("Port " + str(args.port) + ": Closed")
 			return resultslist
 	except:
@@ -145,13 +145,13 @@ def initiatePortScan(ip):
 			else:
 				status = TCPscanThePort(ip, int(port))
 			if status == 1:
-				resultslist.append("Port " + str(port) + ": Open")
+				resultslist.append("Port " + str(port) + ": Open")#for writing to a file
 				print("Port " + str(port) + ": Open")
 			elif status == 2:
-				resultslist.append("Port " + str(port) + ": Filtered")
+				resultslist.append("Port " + str(port) + ": Filtered")#for writing to a file
 				print("Port " + str(port) + ": Filtered")
 			else:
-				resultslist.append("Port " + str(port) + ": Closed")
+				resultslist.append("Port " + str(port) + ": Closed")#for writing to a file
 				print("Port " + str(port) + ": Closed")
 		return resultslist
 
@@ -167,30 +167,30 @@ def writeToFile(resultslist):
 			<h4>Results:</h4>
 			<ul>"""
 	for i in resultslist:
-			wrapper += '<li>%s</li>' % i
+			wrapper += '<li>%s</li>' % i #for each item in the list, write it out
 
 	wrapper += """
 			</ul>
 		</body>
 	</html>"""
 
-	f.write(wrapper)
-	f.close()
+	f.write(wrapper) #write to the file
+	f.close() #close the file
 
-
+#MAIN FUNCTIONS - this will populate the help portion
 parser = argparse.ArgumentParser(description='This is a simple port scanner')
 parser.add_argument('-i', '--ipaddress', action="store", help='Type in IP address of host machine; Type in multiple hosts by adding a "-<last host\'final two digits>"')
 parser.add_argument('-p', '--port', action="store", help='Type in port(s) you wish to scan (use a dash to indicate the range), default is ports 1 -100')
 parser.add_argument('-t', '--traceroute', action="store", help='Type in IP address you wish to get a route to')
 parser.add_argument('-u', '--protocol', action="store", help='Type in UDP or TCP after, default is TCP')
 parser.add_argument('-w', '--write', action="store", help='Type in the filename you would like to save the results as')
-args = parser.parse_args()
+args = parser.parse_args() #gets the arguments
 
 start_time = datetime.now()
 SYNACK = 0x12
 RSTACK = 0x14
 
-signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGINT, signal_handler) #if ctrl + C is pressed please stop
 
 print("[*] Starting Phillip's Fantastic Port Scanner\n")
 
@@ -227,17 +227,17 @@ try:
 		iprange = range(int(ipseries[3]), int(iplist[1])+1)
 		for ip in iprange:
 			print("[->] IP Address: " + str(actualip) + str(ip))
-			resultslist.append(str(actualip) + str(ip))
-			listofports = initiatePortScan(str(actualip) + str(ip))
-			resultslist.append(listofports)
+			resultslist.append(str(actualip) + str(ip))#get the ip address into the list
+			listofports = initiatePortScan(str(actualip) + str(ip))#run the port scan and get back the results
+			resultslist.append(listofports)#append the results after the ip address
 	else:
-		resultslist.append(str(args.ipaddress))
-		listofports = initiatePortScan(args.ipaddress)
-		resultslist.append(listofports)
+		resultslist.append(str(args.ipaddress)) #get the ip address into the list
+		listofports = initiatePortScan(args.ipaddress) #run the port scan and get back the results
+		resultslist.append(listofports) #append the results after the ip address
 except:
 	sys.exit(1)
 
-if args.write is not None:
+if args.write is not None: #if the write flag exists then run the code
 	writeToFile(resultslist)
 
 end_time = datetime.now()
@@ -253,3 +253,4 @@ print("[*] Elapsed Time " + str(elapsed_time))
 #http://jvns.ca/blog/2013/10/31/day-20-scapy-and-traceroute/
 #http://resources.infosecinstitute.com/port-scanning-using-scapy/
 #http://stackoverflow.com/questions/7427101/dead-simple-argparse-example-wanted-1-argument-3-results
+#http://stackoverflow.com/questions/1475123/easiest-way-to-turn-a-list-into-an-html-table-in-python
