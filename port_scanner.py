@@ -39,11 +39,20 @@ def scanThePort(hostaddress, portnumber):
 	send(RSTpkt)
 
 def traceroute(destinationaddress):
-	return
+	ans,unans=sr(IP(dst=destinationaddress, ttl=(4,25),id=RandShort())/TCP(flags=0x2))
+	try:
+		for snd,rcv in ans:
+			print snd.ttl, rcv.src, isinstance(rcv.payload, TCP)
+	except:
+		print("\n[!] Unknown problem detected!")
+		print("[!] Exiting program...")
+		sys.exit(1)
+	sys.exit(1)
 
 parser = argparse.ArgumentParser(description='This is a simple port scanner')
-parser.add_argument('-i', '--ipaddress', action="store", required=True, help='Type in IP address of host machine')
-parser.add_argument('-p', '--port', action="store", required=True, help='Type in port(s) you wish to scan (use a dash to indicate the range')
+parser.add_argument('-i', '--ipaddress', action="store", help='Type in IP address of host machine')
+parser.add_argument('-p', '--port', action="store", help='Type in port(s) you wish to scan (use a dash to indicate the range')
+parser.add_argument('-t', '--traceroute', action="store", help='Type in IP address you wish to get a route to')
 args = parser.parse_args()
 
 
@@ -53,6 +62,8 @@ RSTACK = 0x14
 
 print("[*] Starting Phillip's Fantastic Port Scanner\n")
 
+if args.traceroute != None:
+	traceroute(args.traceroute)
 
 #range of ports
 portrange = args.port
